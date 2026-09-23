@@ -114,6 +114,13 @@
   #define MODEL_11            0x11 // RAK4631, 433 Mhz
   #define MODEL_12            0x12 // RAK4631, 868 Mhz
 
+  // Profil local (non officiel) : Seeed XIAO nRF52840 + module Wio-SX1262. Codes choisis parmi les valeurs
+  // inutilisées de ce fichier (aucun conflit avec un modèle officiel) -- projet explore-reticulum, 2026-09-23.
+  #define PRODUCT_XIAO_NRF52840 0xEC
+  #define BOARD_XIAO_NRF52840   0x52
+  #define MODEL_18              0x18 // Xiao nRF52840 + Wio-SX1262, 433 MHz
+  #define MODEL_19              0x19 // Xiao nRF52840 + Wio-SX1262, 868 MHz
+
   #define PRODUCT_HMBRW       0xF0
   #define BOARD_HMBRW         0x32
   #define BOARD_HUZZAH32      0x34
@@ -894,6 +901,48 @@
       const int DISPLAY_CLK = PIN_T114_TFT_SCK;
       const int DISPLAY_BL_PIN = PIN_T114_TFT_BLGT;
       const int DISPLAY_RST = PIN_T114_TFT_RST;
+
+    #elif BOARD_MODEL == BOARD_XIAO_NRF52840
+      // Profil local (non officiel), voir les défines PRODUCT_XIAO_NRF52840/BOARD_XIAO_NRF52840 plus haut.
+      // Brochage repris tel quel du firmware MeshCore déjà validé sur ce combo précis (carte + module physiques
+      // identiques) : ~/MeshCore/variants/xiao_nrf52/platformio.ini, alias D1..D7 confirmés dans le variant.h
+      // Seeed installé ici (Seeeduino:nrf52 1.1.13, Seeed_XIAO_nRF52840/variant.h) -- D1=1, D2=2, ..., D7=7,
+      // MOSI/MISO/SCK par défaut de la carte (10/9/8, header standard XIAO, pas besoin de SPI bit-bang custom).
+      #define MODEM SX1262
+      #define HAS_EEPROM false
+      #define HAS_DISPLAY false
+      #define HAS_BLUETOOTH false
+      #define HAS_BLE true
+      #define HAS_CONSOLE false
+      #define HAS_PMU false
+      #define HAS_NP false
+      #define HAS_SD false
+      #define HAS_TCXO true
+      #define HAS_RF_SWITCH_RX_TX true          // SX126X_RXEN côté MeshCore -- pas de pin TXEN séparée (DIO2 fait office de switch RF)
+      #define HAS_BUSY true
+      #define HAS_INPUT false
+      #define DIO2_AS_RF_SWITCH true             // = SX126X_DIO2_AS_RF_SWITCH=1 côté MeshCore
+      #define CONFIG_UART_BUFFER_SIZE 6144
+      #define CONFIG_QUEUE_SIZE 6144
+      #define CONFIG_QUEUE_MAX_LENGTH 200
+      #define EEPROM_SIZE 296
+      #define EEPROM_OFFSET EEPROM_SIZE-EEPROM_RESERVED
+      #define BLE_MANUFACTURER "Seeed Studio"
+      #define BLE_MODEL "XIAO nRF52840 + Wio-SX1262"
+
+      // pins pour le module SX1262 (Wio-SX1262), brochage MeshCore
+      const int pin_reset = 2;   // D2
+      const int pin_cs     = 4;   // D4 (NSS)
+      const int pin_sclk   = 8;   // SCK par défaut de la carte
+      const int pin_mosi   = 10;  // MOSI par défaut de la carte
+      const int pin_miso   = 9;   // MISO par défaut de la carte
+      const int pin_busy   = 3;   // D3
+      const int pin_dio    = 1;   // D1 (DIO1)
+      const int pin_rxen   = 5;   // D5 (SX126X_RXEN)
+      const int pin_txen   = -1;  // pas de pin TXEN séparée (RADIOLIB_NC côté MeshCore)
+      const int pin_tcxo_enable = -1;
+      const int pin_led_rx = 12;  // LED_BLUE (variant.h)
+      const int pin_led_tx = 11;  // LED_RED (variant.h) -- même choix que MeshCore pour P_LORA_TX_LED
 
     #else
       #error An unsupported nRF board was selected. Cannot compile RNode firmware.

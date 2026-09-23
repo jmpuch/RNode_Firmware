@@ -703,6 +703,10 @@ void sx126x::enableTCXO() {
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_HELTEC32_V4
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
+    #elif BOARD_MODEL == BOARD_XIAO_NRF52840
+      // 1,8V confirmé par la config MeshCore déjà validée sur ce module (SX126X_DIO3_TCXO_VOLTAGE=1.8) --
+      // PAS 3,3V comme RAK4631/Heltec V3/XIAO_S3, malgré le même radio SX1262.
+      uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #endif
     executeOpcode(OP_DIO3_TCXO_CTRL_6X, buf, 4);
   #endif

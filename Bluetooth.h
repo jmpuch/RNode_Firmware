@@ -490,9 +490,8 @@ char bt_devname[11];
   }
 
   bool bt_setup_hw() {
-    // Serial.println("Setup HW");
     if (!bt_ready) {
-      #if HAS_EEPROM 
+      #if HAS_EEPROM
           if (EEPROM.read(eeprom_addr(ADDR_CONF_BT)) == BT_ENABLE_BYTE) {
       #else
           if (eeprom_read(eeprom_addr(ADDR_CONF_BT)) == BT_ENABLE_BYTE) {

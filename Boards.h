@@ -908,6 +908,18 @@
       // identiques) : ~/MeshCore/variants/xiao_nrf52/platformio.ini, alias D1..D7 confirmés dans le variant.h
       // Seeed installé ici (Seeeduino:nrf52 1.1.13, Seeed_XIAO_nRF52840/variant.h) -- D1=1, D2=2, ..., D7=7,
       // MOSI/MISO/SCK par défaut de la carte (10/9/8, header standard XIAO, pas besoin de SPI bit-bang custom).
+      //
+      // LIMITATION CONNUE (2026-09-23) : APPLICATION_START/IMG_SIZE_START (Device.h) sont câblés en dur pour la
+      // disposition mémoire du bootloader Adafruit de référence -- le bootloader SEEED de cette carte ne stocke
+      // visiblement pas la taille d'application au même endroit (IMG_SIZE_START=0xFF008), donc
+      // calculate_region_hash() calcule un hash de firmware entièrement à zéro, fw_signature_validated reste
+      // false, et device_init() échoue silencieusement (bloque tout : radio ET BLE, pas juste la signature) --
+      // diagnostiqué en isolant chaque étape du boot (SPI seul, EEPROM+SPI, BLE seul, BLE+config : tout
+      // fonctionne isolément) jusqu'à cette différence précise. Désactivé ici en attendant de retrouver la
+      // vraie adresse côté bootloader Seeed ; aucun impact sur le fonctionnement radio/KISS, seulement sur
+      // cette vérification d'intégrité optionnelle.
+      #undef VALIDATE_FIRMWARE
+      #define VALIDATE_FIRMWARE false
       #define MODEM SX1262
       #define HAS_EEPROM false
       #define HAS_DISPLAY false

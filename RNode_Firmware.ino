@@ -193,8 +193,12 @@ void setup() {
       #endif
     #endif
 
-    #if BOARD_MODEL == BOARD_XIAO_S3
-      // Improve wakeup from sleep
+    #if BOARD_MODEL == BOARD_XIAO_S3 || BOARD_MODEL == BOARD_XIAO_NRF52840
+      // Improve wakeup from sleep (XIAO_NRF52840 : même module Wio-SX1262 physique que XIAO_S3, même besoin --
+      // preInit() ne configure jamais le pin RESET lui-même, seulement CS ; sans cette impulsion explicite,
+      // modem_installed reste à 0 au boot -- diagnostiqué le 2026-09-23 par instrumentation directe du firmware,
+      // confirmé : chaque reproduction isolée qui asserte RESET avant les lectures SPI réussit, celles qui ne le
+      // font pas (comme le vrai preInit() seul) échouent silencieusement).
       delay(300);
       LoRa->reset();
       delay(100);
@@ -204,7 +208,7 @@ void setup() {
     // probe boot parameters.
     if (LoRa->preInit()) {
       modem_installed = true;
-      
+
       #if HAS_INPUT
         // Skip quick-reset console activation
       #else
